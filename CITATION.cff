@@ -17,3 +17,8 @@ keywords:
 - atmospheric correction
 - dark object subtraction
 - precision agriculture
+
+identifiers:
+- type: doi
+  value: 10.5281/zenodo.21997000
+  description: Archived snapshot on Zenodo
