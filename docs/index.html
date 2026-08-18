@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STADOS: Radiometric Harmonization for Multi-Temporal NDVI | Naziru Halilu</title>
+<meta name="description" content="39% and 31% reduction in temporal variance for water and rooftop anchors Research overview, methodology, and interactive walkthrough by Naziru Halilu.">
+<meta name="author" content="Naziru Halilu">
+<meta property="og:title" content="STADOS: Radiometric Harmonization for Multi-Temporal NDVI">
+<meta property="og:description" content="39% and 31% reduction in temporal variance for water and rooftop anchors">
+<meta property="og:image" content="graphical_abstract.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="avatar.png">
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --border: #e2e0d8; --text: #1a1a18;
+    --text-secondary: #6b6a63; --accent-bg: #eaf1fb; --accent-text: #185fa5; --accent-border: #85b7eb;
+    --particle: #378ADD; --node: #b4b2a9;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:3rem 1.5rem; background:var(--bg); color:var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .site-header { display:flex; align-items:center; gap:12px; margin-bottom:1.75rem; padding-bottom:1.5rem;
+    border-bottom: 1px solid var(--border); }
+  .site-header img { width:44px; height:44px; border-radius:50%; object-fit:cover; border:1px solid var(--border); }
+  .site-header-name { font-size:14.5px; font-weight:600; margin:0; }
+  .site-header-role { font-size:12.5px; color:var(--text-secondary); margin:2px 0 0; }
+  .site-header-links { margin-left:auto; display:flex; gap:14px; }
+  .site-header-links a { font-size:12.5px; color:var(--accent-text); text-decoration:none; }
+  .site-header-links a:hover { text-decoration:underline; }
+  h1 { font-size: 21px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .metric { font-size: 14px; color: var(--text-secondary); margin: 0 0 1.75rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .solve-card { background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 12px;
+    padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .solve-row { display:flex; gap:12px; margin-bottom:10px; align-items:flex-start; }
+  .solve-row:last-child { margin-bottom:0; }
+  .solve-tag { font-size:11px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--accent-text);
+    width:78px; flex-shrink:0; padding-top:1px; }
+  .solve-text { font-size:14px; line-height:1.55; color:var(--text); }
+  .sim-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; margin: 0 0 8px; font-weight: 600; }
+  svg#sim { width: 100%; height: auto; margin-bottom: 1.25rem; }
+  #particle { transition: cx 1.6s ease-in-out; }
+  .workflow-sketch-wrap { margin-bottom: 1.25rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.25rem; }
+  .chip { font-size:12.5px; padding:7px 12px; border-radius:999px; border:1px solid var(--border);
+    background:var(--bg); cursor:pointer; transition:.25s; color:var(--text); }
+  .chip.active { background:var(--accent-bg); color:var(--accent-text); border-color:var(--accent-border); }
+  .chat-row { display:flex; gap:10px; align-items:flex-start; }
+  .avatar { width:36px; height:36px; border-radius:50%; flex-shrink:0; object-fit:cover; border:1px solid var(--border); }
+  .bubble-col { flex:1; min-width:0; }
+  .bubble-name { font-size:12px; color:var(--text-secondary); margin:0 0 4px; }
+  .bubble { background:var(--bg); border-radius:12px; border-top-left-radius:4px; padding:0.85rem 1rem;
+    min-height:52px; display:flex; align-items:center; font-size:14.5px; line-height:1.6; }
+  .step-figure { width:100%; border-radius:10px; border:1px solid var(--border); margin:12px 0 4px; display:block; }
+  .step-figure-cap { font-size:11.5px; color:var(--text-secondary); margin:0 0 12px; }
+  .figure { width:100%; border-radius:10px; border:1px solid var(--border); margin-bottom:1.25rem; display:block; }
+  .convo-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top:1.25rem; }
+  .convo-title { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .convo-sub { font-size:13px; color:var(--text-secondary); margin:0 0 1rem; }
+  .convo-controls { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
+  .convo-progress { flex:1; height:4px; background:var(--bg); border-radius:99px; overflow:hidden; }
+  .convo-progress-bar { height:100%; background:var(--accent-text); width:0%; transition:width .3s linear; }
+  .convo-counter { font-size:12px; color:var(--text-secondary); white-space:nowrap; }
+  .convo-log { max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding-right:4px; }
+  .convo-row { display:flex; gap:10px; align-items:flex-start; }
+  .convo-row.mine { flex-direction:row-reverse; }
+  .convo-avatar { width:30px; height:30px; border-radius:50%; flex-shrink:0; object-fit:cover; border:1px solid var(--border); }
+  .convo-bubble { background:var(--bg); border-radius:12px; padding:0.7rem 0.95rem; font-size:14px; line-height:1.55; max-width:calc(100% - 80px); }
+  .convo-bubble.q { border-top-left-radius:4px; }
+  .convo-bubble.a { border-top-right-radius:4px; background:var(--accent-bg); color:var(--accent-text); }
+  .ask-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top:1.25rem; }
+  .ask-title { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .ask-sub { font-size:13px; color:var(--text-secondary); margin:0 0 1rem; }
+  .ask-field { width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg); color:var(--text); font-size:14px; font-family:inherit; margin-bottom:10px; }
+  textarea.ask-field { min-height:90px; resize:vertical; }
+  .ask-btn { background:var(--accent-text); color:#fff; border:none; border-radius:8px; padding:10px 18px;
+    font-size:14px; font-weight:500; cursor:pointer; }
+  .ask-btn:hover { opacity:.9; }
+  .ask-note { font-size:12px; color:var(--text-secondary); margin-top:8px; }
+  .ask-status { font-size:13px; margin-top:10px; display:none; }
+  .ask-status.ok { color:#1d9e75; display:block; }
+  .ask-status.err { color:#e24b4a; display:block; }
+  .ask-btn:disabled { opacity:.6; cursor:default; }
+  .viva-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top:1.25rem; }
+  .viva-title { font-size:15px; font-weight:600; margin:0 0 4px; }
+  .viva-sub { font-size:13px; color:var(--text-secondary); margin:0 0 1.25rem; }
+  .viva-cat-nav { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1.25rem; }
+  .viva-cat-btn { font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--border);
+    background:var(--bg); cursor:pointer; color:var(--text-secondary); }
+  .viva-cat-btn.active { background:var(--accent-bg); color:var(--accent-text); border-color:var(--accent-border); }
+  .viva-row { display:flex; gap:10px; align-items:flex-start; margin-bottom:14px; }
+  .viva-row.mine { flex-direction:row-reverse; }
+  .viva-avatar { width:32px; height:32px; border-radius:50%; flex-shrink:0; object-fit:cover; border:1px solid var(--border); }
+  .viva-bubble { background:var(--bg); border-radius:12px; padding:0.7rem 0.95rem; font-size:14px; line-height:1.55; max-width:calc(100% - 90px); }
+  .viva-bubble.q { border-top-left-radius:4px; }
+  .viva-bubble.a { border-top-right-radius:4px; background:var(--accent-bg); color:var(--accent-text); }
+  .viva-nav-btns { display:flex; justify-content:space-between; margin-top:1rem; }
+  .viva-counter { font-size:12px; color:var(--text-secondary); align-self:center; }
+  .viva-locked { text-align:center; padding:1rem 0; }
+  .viva-lock-icon { font-size:22px; margin-bottom:8px; }
+  .viva-locked p { font-size:13px; color:var(--text-secondary); margin:0 0 12px; }
+  .viva-pw-row { display:flex; gap:8px; max-width:280px; margin:0 auto; }
+  .viva-pw-row input { flex:1; padding:9px 12px; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg); color:var(--text); font-size:14px; }
+  .viva-pw-row button { background:var(--accent-text); color:#fff; border:none; border-radius:8px;
+    padding:9px 14px; font-size:14px; font-weight:500; cursor:pointer; }
+  .viva-pw-err { font-size:12px; color:#e24b4a; margin-top:8px; display:none; }
+  .back { display:inline-block; margin-top:1.5rem; font-size:13px; color:var(--accent-text); text-decoration:none; }
+  .site-footer { margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--border); }
+  .cite-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1rem; }
+  .cite-label { font-size:11.5px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; margin:0 0 6px; font-weight:600; }
+  .cite-text { font-size:13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color:var(--text); margin:0; word-break:break-word; }
+  .footer-meta { font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#171715; --card:#201f1c; --border:#37362f; --text:#eceae2; --text-secondary:#9c9a92;
+      --accent-bg:#0c447c; --accent-text:#b5d4f4; --accent-border:#185fa5; --particle:#85b7eb; --node:#5f5e5a; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="site-header">
+    <img src="avatar.png" alt="Naziru Halilu">
+    <div>
+      <p class="site-header-name">Naziru Halilu</p>
+      <p class="site-header-role">AgEngineering &middot; Computer Vision &middot; Spatial Data &amp; GIS</p>
+    </div>
+    <div class="site-header-links">
+      <a href="https://github.com/halilunaziru73-creator">GitHub profile</a>
+      <a href="https://github.com/halilunaziru73-creator/STADOS-Spectral-Temporal-Adaptive-Dark-Object-Subtraction">Repository</a>
+    </div>
+  </div>
+  <h1>STADOS: Radiometric Harmonization for Multi-Temporal NDVI</h1>
+  <p class="metric">39% and 31% reduction in temporal variance for water and rooftop anchors</p>
+  <div class="solve-card">
+    <div class="solve-row"><span class="solve-tag">Problem</span><span class="solve-text">Raw NDVI drifts across satellite acquisition dates because of atmospheric path radiance that changes with each pass, making it hard to trust whether a crop's vegetation trend is real or just an artefact of the atmosphere that day.</span></div>
+    <div class="solve-row"><span class="solve-tag">Solution</span><span class="solve-text">A five-stage framework that identifies stable reference objects in the scene, weights them by reliability, and solves for a per-date correction factor that removes the atmospheric drift while leaving NDVI's mathematical definition untouched.</span></div>
+    <div class="solve-row"><span class="solve-tag">Impact</span><span class="solve-text">39% and 31% less temporal noise on the two most reliable reference classes, with a documented, honestly quantified trade-off for the anchor that doesn't fully cooperate with a single shared correction.</span></div>
+  </div>
+  <div class="card">
+    <p class="sim-label">Process simulation</p>
+    <svg id="sim" viewBox="0 0 680 100" role="img" aria-label="Animated process simulation">
+      <line x1="40" y1="55" x2="640" y2="55" stroke="var(--node)" stroke-width="1"/>
+      <g id="nodes"></g>
+      <circle id="particle" cx="40" cy="55" r="8" fill="var(--particle)"/>
+    </svg>
+    <div class="chips" id="chips"></div>
+    <div class="chat-row">
+      <img class="avatar" src="avatar.png" alt="Naziru Halilu">
+      <div class="bubble-col">
+        <p class="bubble-name">Naziru explains this step</p>
+        <div class="bubble" id="detail"></div>
+        <img class="step-figure" id="step-figure" src="" alt="">
+        <p class="step-figure-cap" id="step-figure-cap"></p>
+      </div>
+    </div>
+  </div>
+  <div class="convo-card">
+    <p class="convo-title">Full conversation walkthrough</p>
+    <p class="convo-sub">A complete, in-depth explanation of this project, turn by turn. Runs about 5 minutes if you let it play.</p>
+    <div class="convo-controls">
+      <button class="ask-btn" id="convo-play-btn" onclick="convoToggle()">Play</button>
+      <div class="convo-progress"><div class="convo-progress-bar" id="convo-progress-bar"></div></div>
+      <span class="convo-counter" id="convo-counter"></span>
+    </div>
+    <div class="convo-log" id="convo-log"></div>
+  </div>
+  <div class="ask-card">
+    <p class="ask-title">Ask a question about this work</p>
+    <p class="ask-sub">Send Naziru a question directly, it's delivered straight to his inbox.</p>
+    <input class="ask-field" id="ask-name" type="text" placeholder="Your name">
+    <input class="ask-field" id="ask-email" type="email" placeholder="Your email (so Naziru can reply)">
+    <textarea class="ask-field" id="ask-question" placeholder="What would you like to ask about this project?"></textarea>
+    <button class="ask-btn" id="ask-btn" onclick="sendQuestion()">Send question</button>
+    <p class="ask-status" id="ask-status"></p>
+  </div>
+  <div class="viva-card">
+    <p class="viva-title">Commonly asked questions</p>
+    <p class="viva-sub">Private, for the author only.</p>
+    <div id="viva-locked" class="viva-locked">
+      <div class="viva-lock-icon">&#128274;</div>
+      <p>This section is password-protected.</p>
+      <div class="viva-pw-row">
+        <input type="password" id="viva-pw" placeholder="Password" onkeydown="if(event.key==='Enter')vivaUnlock()">
+        <button onclick="vivaUnlock()">Unlock</button>
+      </div>
+      <p class="viva-pw-err" id="viva-pw-err">Incorrect password.</p>
+    </div>
+    <div id="viva-content" style="display:none">
+      <div class="viva-cat-nav" id="viva-cats"></div>
+      <div id="viva-qa"></div>
+      <div class="viva-nav-btns">
+        <button class="ask-btn" onclick="vivaPrev()">&larr; Previous</button>
+        <span class="viva-counter" id="viva-counter"></span>
+        <button class="ask-btn" onclick="vivaNext()">Next &rarr;</button>
+      </div>
+    </div>
+  </div>
+  <div class="site-footer">
+    <div class="cite-box">
+      <p class="cite-label">Cite this work</p>
+      <p class="cite-text">Halilu, N. STADOS: Radiometric Harmonization for Multi-Temporal NDVI. GitHub repository: https://github.com/halilunaziru73-creator/STADOS-Spectral-Temporal-Adaptive-Dark-Object-Subtraction</p>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; Naziru Halilu</span>
+      <a class="back" href="https://github.com/halilunaziru73-creator/STADOS-Spectral-Temporal-Adaptive-Dark-Object-Subtraction" style="margin-top:0">&larr; Back to GitHub repository</a>
+    </div>
+  </div>
+</div>
+<script>
+const VIVA_PASSWORD = '24434906';
+function vivaUnlock() {
+  const input = document.getElementById('viva-pw').value.trim();
+  if (input === VIVA_PASSWORD) {
+    document.getElementById('viva-locked').style.display = 'none';
+    document.getElementById('viva-content').style.display = 'block';
+    renderViva();
+  } else {
+    document.getElementById('viva-pw-err').style.display = 'block';
+  }
+}
+const vivaPairs = [{"cat": "Big picture and significance", "q": "How would you explain this project to a non-expert in 90 seconds?", "a": "In plain terms: a method that removes atmospheric drift from satellite NDVI readings so crop-monitoring trends across a growing season can actually be trusted."}, {"cat": "Big picture and significance", "q": "What is the primary core research question you are trying to answer?", "a": "Can a multi-object, reliability-weighted dark-object subtraction framework reliably harmonize multi-temporal Sentinel-2 NDVI without altering NDVI's mathematical definition?"}, {"cat": "Big picture and significance", "q": "Why does this research matter to anyone outside of the academic field?", "a": "It matters beyond academia because the findings feed directly into a reusable radiometric correction step that precision-agriculture pipelines can apply before trusting a seasonal NDVI trend."}, {"cat": "Big picture and significance", "q": "What is the ultimate real-world application of the findings?", "a": "A reusable radiometric correction step that precision-agriculture pipelines can apply before trusting a seasonal ndvi trend."}, {"cat": "Big picture and significance", "q": "Why is now the right time to conduct this specific study?", "a": "Now is the right time because of the growing reliance on multi-date Sentinel-2 NDVI for seasonal crop monitoring, where atmospheric drift between acquisitions can look like a real vegetation change."}, {"cat": "Big picture and significance", "q": "What are the major societal or industrial drivers behind this problem?", "a": "The growing reliance on multi-date sentinel-2 ndvi for seasonal crop monitoring, where atmospheric drift between acquisitions can look like a real vegetation change."}, {"cat": "Big picture and significance", "q": "How will the findings influence current policy, practice, or technology?", "a": "The findings are meant to directly inform a reusable radiometric correction step that precision-agriculture pipelines can apply before trusting a seasonal NDVI trend."}, {"cat": "Big picture and significance", "q": "What happens if this research is never done?", "a": "Without this work, precision-agriculture researchers and practitioners building NDVI-based monitoring pipelines would still be relying on less rigorous, less validated approaches to the same decisions."}, {"cat": "Big picture and significance", "q": "Who are the primary stakeholders invested in the outcome of this work?", "a": "Precision-agriculture researchers and practitioners building ndvi-based monitoring pipelines."}, {"cat": "Big picture and significance", "q": "How do you define 'success' for this research project?", "a": "Success means the method demonstrably outperforms the existing baseline approach on real, held-out data, not just on paper."}, {"cat": "Literature and the knowledge gap", "q": "What is the single biggest gap in the current literature this work aims to fill?", "a": "Classical dark-object subtraction uses a single pixel and a single date; no established method generalizes it into a reliability-weighted, multi-object, self-consistent correction validated across multiple dates."}, {"cat": "Literature and the knowledge gap", "q": "Who are the top three definitive authors in this specific niche?", "a": "[Please add your own top three, this needs your real reading list, not a guess]"}, {"cat": "Literature and the knowledge gap", "q": "What are the main competing schools of thought regarding this topic?", "a": "[Please add: the main competing schools of thought as you see them]"}, {"cat": "Literature and the knowledge gap", "q": "Which recent paper in the field do you disagree with the most, and why?", "a": "[Please add: a specific recent paper you disagree with and why]"}, {"cat": "Literature and the knowledge gap", "q": "How does this work directly build upon the most recent breakthrough in the field?", "a": "It builds on dark-object subtraction theory, pseudo-invariant-feature-based radiometric normalization, and Expectation-Maximization-style coordinate descent rather than starting from an unrelated framework."}, {"cat": "Literature and the knowledge gap", "q": "What established academic theory frames this investigation?", "a": "Dark-object subtraction theory, pseudo-invariant-feature-based radiometric normalization, and expectation-maximization-style coordinate descent."}, {"cat": "Literature and the knowledge gap", "q": "How do you know this exact project hasn't already been done by someone else?", "a": "Because classical dark-object subtraction uses a single pixel and a single date; no established method generalizes it into a reliability-weighted, multi-object, self-consistent correction validated across multiple dates, which a literature search specifically confirmed was unaddressed."}, {"cat": "Literature and the knowledge gap", "q": "What is the most controversial debate happening in this research area right now?", "a": "[Please add: the most controversial debate in this area as you currently see it]"}, {"cat": "Literature and the knowledge gap", "q": "Which foundational text or paper is absolutely critical to the introduction?", "a": "[Please add: the one foundational text or paper central to your introduction]"}, {"cat": "Literature and the knowledge gap", "q": "How has your understanding of the literature changed since the project began?", "a": "[Please add: how your understanding of the literature has evolved since starting]"}, {"cat": "Methodology and technical execution", "q": "Why was this specific methodology selected over other available options?", "a": "A five-stage framework: anchor identification, reliability weighting, band-specific calibration, em-style temporal harmonization, and uncertainty-aware reconstruction was chosen specifically because classical dark-object subtraction uses a single pixel and a single date; no established method generalizes it into a reliability-weighted, multi-object, self-consistent correction validated across multiple dates."}, {"cat": "Methodology and technical execution", "q": "What are the inherent biases or limitations built into the chosen method?", "a": "The analysis uses only 3 acquisition dates and up to 5 sample points per class per date, averaged to one value per class-date cell before correction, so the reported variance-reduction percentages are from a very small effective sample."}, {"cat": "Methodology and technical execution", "q": "How do you prove the data collection tools are reliable and valid?", "a": "Reliability is established through cross-validation and, where possible, comparison against classical benchmarks rather than trusting a single model run."}, {"cat": "Methodology and technical execution", "q": "What specific software, equipment, or techniques are mandatory for this work?", "a": "Sentinel-2 b2/b3/b4/b8 reflectance data, python (numpy, pandas, matplotlib, scipy), and a fully deterministic coordinate-descent solver."}, {"cat": "Methodology and technical execution", "q": "How do you plan to analyze the data gathered?", "a": "Analysis follows the validated pipeline described in the manuscript, primarily a five-stage framework: anchor identification, reliability weighting, band-specific calibration, EM-style temporal harmonization, and uncertainty-aware reconstruction."}, {"cat": "Methodology and technical execution", "q": "What is the exact strategy for sampling or acquiring data?", "a": "Sentinel-2 b2/b3/b4/b8 reflectance data, python (numpy, pandas, matplotlib, scipy), and a fully deterministic coordinate-descent solver."}, {"cat": "Methodology and technical execution", "q": "How will missing, corrupted, or anomalous data points be handled?", "a": "[Please add: your actual protocol for handling missing or anomalous data]"}, {"cat": "Methodology and technical execution", "q": "What are the primary ethical considerations or risks involved in the design?", "a": "[Please add: the specific ethical considerations relevant to this project]"}, {"cat": "Methodology and technical execution", "q": "How will reproducibility be ensured if another researcher duplicates the setup?", "a": "All code, data processing steps, and equations are published openly so another researcher can rerun the exact pipeline."}, {"cat": "Methodology and technical execution", "q": "What specific statistical tests or framework validate the results?", "a": "[Please add: the specific statistical tests used to validate results]"}, {"cat": "Novelty, scope and originality", "q": "What makes this project distinctly yours rather than an extension of prior work?", "a": "This project is distinctly mine because documenting a genuine design failure openly: an initial additive correction increased Water's NDVI variance by over 12,000%, and reporting exactly why the multiplicative approach was adopted instead."}, {"cat": "Novelty, scope and originality", "q": "What is the single most original or novel element of the research design?", "a": "Documenting a genuine design failure openly: an initial additive correction increased water's ndvi variance by over 12,000%, and reporting exactly why the multiplicative approach was adopted instead."}, {"cat": "Novelty, scope and originality", "q": "What will the field know in four years that it does not know today?", "a": "In a few years, the field should know documenting a genuine design failure openly: an initial additive correction increased Water's NDVI variance by over 12,000%, and reporting exactly why the multiplicative approach was adopted instead, tested well beyond this initial study."}, {"cat": "Novelty, scope and originality", "q": "What are you explicitly choosing not to study, and why was it excluded?", "a": "[Please add: what you are explicitly choosing not to study, and why]"}, {"cat": "Novelty, scope and originality", "q": "How do you prevent the project scope from creeping and becoming too massive?", "a": "Scope is kept in check by treating each research question as a bounded, separately reportable unit rather than expanding the study mid-way."}, {"cat": "Novelty, scope and originality", "q": "Is this a theoretical contribution, a methodological one, or an empirical one?", "a": "This is primarily a methodological contribution, with empirical validation on real data."}, {"cat": "Novelty, scope and originality", "q": "What assumptions are being made about the variables or environment?", "a": "[Please add: the key assumptions you are making about your variables or environment]"}, {"cat": "Novelty, scope and originality", "q": "How will you know when a specific phase is truly finished?", "a": "A phase is considered finished once its research question is answered with validated, reproducible results, not just a completed draft."}, {"cat": "Novelty, scope and originality", "q": "What is the main hypothesis, and what happens if the exact opposite is true?", "a": "A reliability-weighted, multi-anchor correction will reduce temporal variance for stable land-cover classes more than a naive single-anchor approach, without distorting ndvi's raw-vs-corrected regression slope."}, {"cat": "Novelty, scope and originality", "q": "How do you plan to publish these findings into distinct journal papers?", "a": "[Please add: your actual publication plan and target journals]"}, {"cat": "Feasibility, risks and project management", "q": "What is the biggest technical bottleneck expected in the near term?", "a": "The framework currently corrects only the near-infrared band; visible-band atmospheric contamination in hazier acquisitions is not yet addressed."}, {"cat": "Feasibility, risks and project management", "q": "If the primary experiment or data source fails completely, what is the backup plan?", "a": "[Please add: your real backup plan if the primary approach fails]"}, {"cat": "Feasibility, risks and project management", "q": "How will you gain access to the restricted data, archives, or fields required?", "a": "[Please add: how you plan to access any restricted data, archives, or field sites]"}, {"cat": "Feasibility, risks and project management", "q": "What is the realistic timeline for completing data collection versus analysis?", "a": "[Please add: your realistic timeline for data collection versus analysis]"}, {"cat": "Feasibility, risks and project management", "q": "What specific training or skills are still needed to finish this project?", "a": "[Please add: the specific skills or training you still need]"}, {"cat": "Feasibility, risks and project management", "q": "How will the budget, resources, or materials allocated be managed?", "a": "[Please add: how you are managing budget and resources]"}, {"cat": "Feasibility, risks and project management", "q": "What are the safety or environmental hazards associated with the work?", "a": "[Please add: any safety or environmental hazards specific to your work]"}, {"cat": "Feasibility, risks and project management", "q": "How will you handle a situation where the data contradicts the original hypothesis?", "a": "If the data contradicts the original hypothesis, that result is reported honestly rather than reframed to fit expectations."}, {"cat": "Feasibility, risks and project management", "q": "What do you anticipate will be the hardest part of this project to write up?", "a": "The framework currently corrects only the near-infrared band; visible-band atmospheric contamination in hazier acquisitions is not yet addressed."}, {"cat": "Feasibility, risks and project management", "q": "Why are you personally the right person to execute this specific project?", "a": "[Please add: why you personally are positioned to carry this project through]"}];
+let vivaIdx = 0;
+const vivaCats = [...new Set(vivaPairs.map(p => p.cat))];
+
+function renderVivaCats() {
+  const nav = document.getElementById('viva-cats');
+  nav.innerHTML = '';
+  vivaCats.forEach((c) => {
+    const b = document.createElement('button');
+    b.className = 'viva-cat-btn' + (vivaPairs[vivaIdx].cat === c ? ' active' : '');
+    b.textContent = c;
+    b.onclick = () => { vivaIdx = vivaPairs.findIndex(p => p.cat === c); renderViva(); };
+    nav.appendChild(b);
+  });
+}
+
+function renderViva() {
+  const pair = vivaPairs[vivaIdx];
+  const qa = document.getElementById('viva-qa');
+  qa.innerHTML = '';
+  const qRow = document.createElement('div');
+  qRow.className = 'viva-row';
+  qRow.innerHTML = '<div class="viva-avatar" style="display:flex;align-items:center;justify-content:center;background:var(--bg);font-size:11px;color:var(--text-secondary)">Q</div><div class="viva-bubble q">' + pair.q + '</div>';
+  qa.appendChild(qRow);
+  const aRow = document.createElement('div');
+  aRow.className = 'viva-row mine';
+  aRow.innerHTML = '<img class="viva-avatar" src="avatar.png" alt="Naziru"><div class="viva-bubble a">' + pair.a + '</div>';
+  qa.appendChild(aRow);
+  document.getElementById('viva-counter').textContent = (vivaIdx + 1) + ' / ' + vivaPairs.length;
+  renderVivaCats();
+}
+
+function vivaNext() { vivaIdx = (vivaIdx + 1) % vivaPairs.length; renderViva(); }
+function vivaPrev() { vivaIdx = (vivaIdx - 1 + vivaPairs.length) % vivaPairs.length; renderViva(); }
+</script>
+<script>
+const convoTurns = [{"q": "Let's start from the top. What is STADOS: Radiometric Harmonization for Multi-Temporal NDVI actually about?", "a": "At a high level, this project is about multi-object dark-reference identification through to uncertainty-aware ndvi reconstruction, and the headline result is 39% and 31% reduction in temporal variance for water and rooftop anchors. Let me walk you through it step by step, the way it actually unfolds."}, {"q": "Step 1: can you explain multi-object dark-reference identification in more depth?", "a": "Water, Unmade_road and House are used as hard radiometric anchors, stable land-cover types that shouldn't change much between February, July and October. Trees are deliberately excluded from the fit, since their NIR signal reflects real leaf growth, not an atmospheric artefact, a distinction confirmed empirically later in the analysis."}, {"q": "Step 2: can you explain spectral reliability assessment in more depth?", "a": "Each anchor is weighted by the inverse of its own temporal coefficient of variation on the near-infrared band, so an anchor that already behaves consistently across dates gets more influence over the correction than a noisier one."}, {"q": "Step 3: can you explain band-specific calibration estimation in more depth?", "a": "A single multiplicative NIR calibration factor is estimated per acquisition date. An additive version was tried first and caused Water's NDVI variance to increase by over 12,000%, a genuinely instructive failure that motivated the switch to a multiplicative correction."}, {"q": "Step 4: can you explain temporal radiometric harmonization in more depth?", "a": "The calibration factor for each date is solved by an EM-style coordinate-descent scheme that iteratively minimizes the paper's own temporal-harmonization loss. Adding a renormalization step cut convergence from over 200 non-convergent iterations down to exactly 3."}, {"q": "Step 5: can you explain uncertainty-aware ndvi reconstruction in more depth?", "a": "The corrected NDVI is reported alongside a temporal-uncertainty diagnostic, the standard deviation of NDVI for each pseudo-invariant class, before and after correction, making the trade-offs of a single shared calibration factor explicit rather than hidden."}, {"q": "Who actually benefits from this work in practice, and how?", "a": "The intended beneficiaries are the people who'd use 39% and 31% reduction in temporal variance for water and rooftop anchors to make a real decision, not just cite a number. That's the whole point of building this as a working pipeline with 5 documented stages rather than a one-off result."}, {"q": "If someone only remembers one thing from this project, what should it be?", "a": "That 39% and 31% reduction in temporal variance for water and rooftop anchors isn't just a number on a slide, it came from a full pipeline of 5 deliberate steps, each one tested and documented, from multi-object dark-reference identification all the way through to uncertainty-aware ndvi reconstruction. Every claim here traces back to real code and real data."}];
+const CONVO_SECONDS_PER_TURN = 35;
+let convoIdx = 0;
+let convoPlaying = false;
+let convoTimer = null;
+let convoElapsedMs = 0;
+
+function convoAppendTurn(i) {
+  const t = convoTurns[i];
+  const log = document.getElementById('convo-log');
+  const qRow = document.createElement('div');
+  qRow.className = 'convo-row';
+  qRow.innerHTML = '<div class="convo-avatar" style="display:flex;align-items:center;justify-content:center;background:var(--bg);font-size:11px;color:var(--text-secondary)">Q</div><div class="convo-bubble q">' + t.q + '</div>';
+  log.appendChild(qRow);
+  const aRow = document.createElement('div');
+  aRow.className = 'convo-row mine';
+  aRow.innerHTML = '<img class="convo-avatar" src="avatar.png" alt="Naziru"><div class="convo-bubble a">' + t.a + '</div>';
+  log.appendChild(aRow);
+  log.scrollTop = log.scrollHeight;
+}
+
+function convoUpdateCounter() {
+  document.getElementById('convo-counter').textContent = (convoIdx) + ' / ' + convoTurns.length;
+}
+
+function convoTick() {
+  convoElapsedMs += 200;
+  const pct = Math.min(100, (convoElapsedMs / (CONVO_SECONDS_PER_TURN * 1000)) * 100);
+  document.getElementById('convo-progress-bar').style.width = pct + '%';
+  if (convoElapsedMs >= CONVO_SECONDS_PER_TURN * 1000) {
+    convoElapsedMs = 0;
+    if (convoIdx < convoTurns.length) {
+      convoAppendTurn(convoIdx);
+      convoIdx++;
+      convoUpdateCounter();
+    }
+    if (convoIdx >= convoTurns.length) {
+      convoStop();
+      document.getElementById('convo-play-btn').textContent = 'Replay';
+    }
+  }
+}
+
+function convoStart() {
+  if (convoIdx >= convoTurns.length) {
+    document.getElementById('convo-log').innerHTML = '';
+    convoIdx = 0;
+    convoElapsedMs = 0;
+    convoUpdateCounter();
+  }
+  if (convoIdx === 0 && document.getElementById('convo-log').children.length === 0) {
+    convoAppendTurn(0);
+    convoIdx = 1;
+    convoUpdateCounter();
+  }
+  convoPlaying = true;
+  document.getElementById('convo-play-btn').textContent = 'Pause';
+  convoTimer = setInterval(convoTick, 200);
+}
+
+function convoStop() {
+  convoPlaying = false;
+  document.getElementById('convo-play-btn').textContent = 'Play';
+  if (convoTimer) { clearInterval(convoTimer); convoTimer = null; }
+}
+
+function convoToggle() {
+  if (convoPlaying) { convoStop(); } else { convoStart(); }
+}
+
+convoUpdateCounter();
+</script>
+<script>
+async function sendQuestion() {
+  const name = document.getElementById('ask-name').value.trim();
+  const email = document.getElementById('ask-email').value.trim();
+  const question = document.getElementById('ask-question').value.trim();
+  const status = document.getElementById('ask-status');
+  const btn = document.getElementById('ask-btn');
+  status.className = 'ask-status';
+  if (!question) { status.textContent = 'Please enter a question.'; status.className = 'ask-status err'; return; }
+  if (!email) { status.textContent = 'Please enter your email so Naziru can reply.'; status.className = 'ask-status err'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: 'b58a03ec-1761-4115-8b5b-7bba5bc4b65a',
+        subject: 'Question about: STADOS: Radiometric Harmonization for Multi-Temporal NDVI',
+        name: name || 'Anonymous',
+        email: email,
+        message: question
+      })
+    });
+    const result = await res.json();
+    if (result.success) {
+      status.textContent = 'Sent. Naziru will reply to your email.';
+      status.className = 'ask-status ok';
+      document.getElementById('ask-name').value = '';
+      document.getElementById('ask-email').value = '';
+      document.getElementById('ask-question').value = '';
+    } else {
+      status.textContent = 'Something went wrong. Please try again.';
+      status.className = 'ask-status err';
+    }
+  } catch (e) {
+    status.textContent = 'Network error. Please try again.';
+    status.className = 'ask-status err';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Send question';
+}
+</script>
+<script>
+const steps = [{"t": "Multi-object dark-reference identification", "img": "figures/Figure_04.png", "d": "Water, Unmade_road and House are used as hard radiometric anchors, stable land-cover types that shouldn't change much between February, July and October. Trees are deliberately excluded from the fit, since their NIR signal reflects real leaf growth, not an atmospheric artefact, a distinction confirmed empirically later in the analysis."}, {"t": "Spectral reliability assessment", "img": "figures/Figure_12.png", "d": "Each anchor is weighted by the inverse of its own temporal coefficient of variation on the near-infrared band, so an anchor that already behaves consistently across dates gets more influence over the correction than a noisier one."}, {"t": "Band-specific calibration estimation", "img": "figures/Figure_07.png", "d": "A single multiplicative NIR calibration factor is estimated per acquisition date. An additive version was tried first and caused Water's NDVI variance to increase by over 12,000%, a genuinely instructive failure that motivated the switch to a multiplicative correction."}, {"t": "Temporal radiometric harmonization", "img": "figures/Figure_06.png", "d": "The calibration factor for each date is solved by an EM-style coordinate-descent scheme that iteratively minimizes the paper's own temporal-harmonization loss. Adding a renormalization step cut convergence from over 200 non-convergent iterations down to exactly 3."}, {"t": "Uncertainty-aware NDVI reconstruction", "img": "figures/Figure_15.png", "d": "The corrected NDVI is reported alongside a temporal-uncertainty diagnostic, the standard deviation of NDVI for each pseudo-invariant class, before and after correction, making the trade-offs of a single shared calibration factor explicit rather than hidden."}];
+let idx = 0;
+let timer = null;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const svgNS = "http://www.w3.org/2000/svg";
+
+function nodeX(i, n) {
+  const left = 40, right = 640;
+  if (n === 1) return left;
+  return left + (right - left) * (i / (n - 1));
+}
+
+function renderNodes() {
+  const g = document.getElementById('nodes');
+  g.innerHTML = '';
+  steps.forEach((s, i) => {
+    const c = document.createElementNS(svgNS, 'circle');
+    c.setAttribute('cx', nodeX(i, steps.length));
+    c.setAttribute('cy', 55);
+    c.setAttribute('r', 5);
+    c.setAttribute('fill', 'var(--node)');
+    g.appendChild(c);
+    const t = document.createElementNS(svgNS, 'text');
+    t.setAttribute('x', nodeX(i, steps.length));
+    t.setAttribute('y', 80);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '11');
+    t.setAttribute('fill', 'var(--text-secondary)');
+    t.textContent = (i + 1);
+    g.appendChild(t);
+  });
+}
+
+function render() {
+  const chipsEl = document.getElementById('chips');
+  chipsEl.innerHTML = '';
+  steps.forEach((s, i) => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (i === idx ? ' active' : '');
+    c.textContent = (i+1) + '. ' + s.t;
+    c.onclick = () => { idx = i; render(); resetTimer(); };
+    chipsEl.appendChild(c);
+  });
+  document.getElementById('detail').textContent = 'Step ' + (idx + 1) + ': ' + steps[idx].t + '. ' + steps[idx].d;
+  document.getElementById('particle').setAttribute('cx', nodeX(idx, steps.length));
+  const fig = document.getElementById('step-figure');
+  const cap = document.getElementById('step-figure-cap');
+  if (steps[idx].img) {
+    fig.src = steps[idx].img;
+    fig.alt = steps[idx].t;
+    fig.style.display = 'block';
+    cap.textContent = 'Figure from the manuscript: ' + steps[idx].t;
+    cap.style.display = 'block';
+  } else {
+    fig.style.display = 'none';
+    cap.style.display = 'none';
+  }
+}
+
+function tick() { idx = (idx + 1) % steps.length; render(); }
+let simInView = true;
+function resetTimer() {
+  if (timer) clearInterval(timer);
+  if (!reduceMotion && simInView) timer = setInterval(tick, 2200);
+}
+
+renderNodes();
+render();
+resetTimer();
+
+const simObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    simInView = entry.isIntersecting;
+    if (simInView) {
+      resetTimer();
+    } else if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  });
+}, { threshold: 0.15 });
+simObserver.observe(document.getElementById('sim'));
+</script>
+</body>
+</html>
