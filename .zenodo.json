@@ -19,5 +19,12 @@
   "license": "MIT",
   "upload_type": "publication",
   "publication_type": "article",
-  "access_right": "open"
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.21997000",
+      "relation": "isIdenticalTo",
+      "scheme": "doi"
+    }
+  ]
 }
