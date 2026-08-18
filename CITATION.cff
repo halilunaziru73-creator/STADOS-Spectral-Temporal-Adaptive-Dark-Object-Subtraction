@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: If you use this work, please cite it as below.
+type: software
+title: 'STADOS: Spectral-Temporal Adaptive Dark Object Subtraction for Radiometrically
+  Harmonized Multi-Temporal Agricultural Vegetation Monitoring'
+authors:
+- family-names: Halilu
+  given-names: Naziru
+  orcid: https://orcid.org/0009-0006-2324-9599
+repository-code: https://github.com/halilunaziru73-creator/STADOS-Spectral-Temporal-Adaptive-Dark-Object-Subtraction
+license: MIT
+date-released: '2026-08-18'
+keywords:
+- remote sensing
+- NDVI
+- Sentinel-2
+- atmospheric correction
+- dark object subtraction
+- precision agriculture
