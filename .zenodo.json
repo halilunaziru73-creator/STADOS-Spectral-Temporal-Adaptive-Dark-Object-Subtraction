@@ -1,0 +1,23 @@
+{
+  "title": "STADOS: Spectral-Temporal Adaptive Dark Object Subtraction for Radiometrically Harmonized Multi-Temporal Agricultural Vegetation Monitoring",
+  "description": "A five-stage radiometric harmonization framework that generalizes classical dark-object subtraction into a multi-object, reliability-weighted, iteratively self-consistent correction, applied to multi-temporal Sentinel-2 NDVI monitoring of corn parcels near Coimbra, Portugal.",
+  "creators": [
+    {
+      "name": "Halilu, Naziru",
+      "orcid": "0009-0006-2324-9599"
+    }
+  ],
+  "keywords": [
+    "remote sensing",
+    "NDVI",
+    "Sentinel-2",
+    "atmospheric correction",
+    "dark object subtraction",
+    "precision agriculture",
+    "radiometric normalization"
+  ],
+  "license": "MIT",
+  "upload_type": "publication",
+  "publication_type": "article",
+  "access_right": "open"
+}
