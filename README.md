@@ -13,6 +13,12 @@ monitoring, together with a complete, reproducible Python implementation.
 
 ## Problem, Methodology, and Results
 
+**Workflow sketch**
+
+![Workflow Sketch](workflow_sketch.png)
+
+[View interactive graphical walkthrough →](https://halilunaziru73-creator.github.io/STADOS-Spectral-Temporal-Adaptive-Dark-Object-Subtraction/)
+
 **Problem.** Multi-temporal vegetation monitoring from Sentinel-2 imagery depends on NDVI computed from red and near-infrared reflectance, yet raw, uncorrected NDVI drifts across acquisition dates because of date-dependent atmospheric path radiance, undermining exactly the kind of within-season trend monitoring the index is most often used for.
 
 ![Figure 4: Raw Sentinel-2 spectral signatures showing atmospheric drift across dates](figures/Figure_04.png)
@@ -30,12 +36,6 @@ monitoring, together with a complete, reproducible Python implementation.
 
 ![Figure 15: NDVI temporal uncertainty before and after correction](figures/Figure_15.png)
 *Figure 15. NDVI temporal uncertainty (standard deviation across the three acquisition dates), before and after STADOS correction.*
-
-**Workflow sketch**
-
-![Workflow Sketch](workflow_sketch.png)
-
-[View interactive graphical walkthrough →](https://halilunaziru73-creator.github.io/STADOS-Spectral-Temporal-Adaptive-Dark-Object-Subtraction/)
 
 ---
 
